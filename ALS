@@ -1,3 +1,9 @@
-task.wait(10)
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+
+local wait_time = 10
+task.wait(wait_time)
+
 script_key="bMaSucarDovAmOtCaUntqosPDnmDuREZ";
 loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/4b153b2605836270be93d3053f7a1e35.lua"))()
