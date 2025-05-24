@@ -1,7 +1,2 @@
-if not game:IsLoaded() then
-    game.Loaded:Wait()
-end
-
-local wait_time = 15
-task.wait(wait_time)
+script_key="HyNGNfmmMRYUTcicUNKnuxTRUWQjGXfE";
 loadstring(game:HttpGet("https://raw.githubusercontent.com/buang5516/buanghub/main/BUANGHUB.lua"))()
