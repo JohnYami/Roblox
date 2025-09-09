@@ -1,4 +1,4 @@
---// Fast Skip Wave + Popup Remover with Save + Optimized
+--// Fast Skip Wave + Popup Remover with Save + Optimized + Hide Hotkey (RightAlt)
 local SETTINGS_FILE = "FastSkipWave_Settings.json"
 local HttpService = game:GetService("HttpService")
 
@@ -34,6 +34,7 @@ local MinimizeButton = Instance.new("TextButton")
 local UserInputService = game:GetService("UserInputService")
 local dragging, dragInput, dragStart, startPos
 local minimized = false
+local hidden = false -- NEW
 
 ScreenGui.Parent = game.CoreGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -192,6 +193,14 @@ MinimizeButton.MouseButton1Click:Connect(function()
 		ToggleButton.Visible = true
 		PopupButton.Visible = true
 		MinimizeButton.Text = "-"
+	end
+end)
+
+-- 🔥 Hide UI with Right Alt
+UserInputService.InputBegan:Connect(function(input, gp)
+	if not gp and input.KeyCode == Enum.KeyCode.RightAlt then
+		hidden = not hidden
+		MainFrame.Visible = not hidden
 	end
 end)
 
