@@ -1,0 +1,256 @@
+-- Slot Switcher GUI for Roblox
+-- Paste this into your executor
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "SlotSwitcherGui"
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.Parent = playerGui
+
+-- Main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 400, 0, 280)
+mainFrame.Position = UDim2.new(0.5, -200, 0.5, -140)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+-- Add rounded corners
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 16)
+mainCorner.Parent = mainFrame
+
+-- Add gradient
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(120, 60, 180)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 30, 90))
+}
+gradient.Rotation = 45
+gradient.Parent = mainFrame
+
+-- Header Frame
+local headerFrame = Instance.new("Frame")
+headerFrame.Name = "Header"
+headerFrame.Size = UDim2.new(1, 0, 0, 60)
+headerFrame.BackgroundColor3 = Color3.fromRGB(140, 70, 200)
+headerFrame.BorderSizePixel = 0
+headerFrame.Parent = mainFrame
+
+local headerCorner = Instance.new("UICorner")
+headerCorner.CornerRadius = UDim.new(0, 16)
+headerCorner.Parent = headerFrame
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Name = "Title"
+title.Size = UDim2.new(1, 0, 1, 0)
+title.BackgroundTransparency = 1
+title.Text = "🎮 Slot Switcher"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 24
+title.Parent = headerFrame
+
+-- Close Button
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0, 40, 0, 40)
+closeButton.Position = UDim2.new(1, -50, 0, 10)
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeButton.Text = "✕"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.GothamBold
+closeButton.TextSize = 20
+closeButton.BorderSizePixel = 0
+closeButton.Parent = headerFrame
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 8)
+closeCorner.Parent = closeButton
+
+-- Slots Container
+local slotsFrame = Instance.new("Frame")
+slotsFrame.Name = "SlotsFrame"
+slotsFrame.Size = UDim2.new(1, -40, 0, 100)
+slotsFrame.Position = UDim2.new(0, 20, 0, 80)
+slotsFrame.BackgroundTransparency = 1
+slotsFrame.Parent = mainFrame
+
+-- Create slot buttons
+local selectedSlot = 1
+
+local function createSlotButton(slotNumber, position)
+	local button = Instance.new("TextButton")
+	button.Name = "Slot" .. slotNumber
+	button.Size = UDim2.new(0, 80, 0, 80)
+	button.Position = position
+	button.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+	button.Text = "Slot " .. slotNumber
+	button.TextColor3 = Color3.fromRGB(200, 200, 200)
+	button.Font = Enum.Font.GothamBold
+	button.TextSize = 16
+	button.BorderSizePixel = 0
+	button.Parent = slotsFrame
+	
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 12)
+	corner.Parent = button
+	
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.fromRGB(100, 100, 120)
+	stroke.Thickness = 2
+	stroke.Parent = button
+	
+	-- Selected indicator
+	local indicator = Instance.new("Frame")
+	indicator.Name = "Indicator"
+	indicator.Size = UDim2.new(0, 12, 0, 12)
+	indicator.Position = UDim2.new(1, -8, 0, -4)
+	indicator.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
+	indicator.BorderSizePixel = 0
+	indicator.Visible = (slotNumber == 1)
+	indicator.Parent = button
+	
+	local indicatorCorner = Instance.new("UICorner")
+	indicatorCorner.CornerRadius = UDim.new(1, 0)
+	indicatorCorner.Parent = indicator
+	
+	return button
+end
+
+local slot1 = createSlotButton(1, UDim2.new(0, 0, 0, 0))
+local slot2 = createSlotButton(2, UDim2.new(0, 90, 0, 0))
+local slot3 = createSlotButton(3, UDim2.new(0, 180, 0, 0))
+local slot4 = createSlotButton(4, UDim2.new(0, 270, 0, 0))
+
+local slots = {slot1, slot2, slot3, slot4}
+
+-- Info Label
+local infoLabel = Instance.new("TextLabel")
+infoLabel.Name = "InfoLabel"
+infoLabel.Size = UDim2.new(1, -40, 0, 40)
+infoLabel.Position = UDim2.new(0, 20, 0, 200)
+infoLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+infoLabel.Text = "Selected: Slot 1"
+infoLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
+infoLabel.Font = Enum.Font.Gotham
+infoLabel.TextSize = 16
+infoLabel.BorderSizePixel = 0
+infoLabel.Parent = mainFrame
+
+local infoCorner = Instance.new("UICorner")
+infoCorner.CornerRadius = UDim.new(0, 8)
+infoCorner.Parent = infoLabel
+
+-- Functions
+local function switchSlot(slotNumber)
+	selectedSlot = slotNumber
+	
+	-- Update visual feedback
+	for i, button in ipairs(slots) do
+		local indicator = button:FindFirstChild("Indicator")
+		if i == slotNumber then
+			button.BackgroundColor3 = Color3.fromRGB(140, 70, 200)
+			button.TextColor3 = Color3.fromRGB(255, 255, 255)
+			if indicator then indicator.Visible = true end
+			
+			-- Animate button
+			local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+			local tween = TweenService:Create(button, tweenInfo, {Size = UDim2.new(0, 85, 0, 85)})
+			tween:Play()
+			tween.Completed:Wait()
+			local tween2 = TweenService:Create(button, tweenInfo, {Size = UDim2.new(0, 80, 0, 80)})
+			tween2:Play()
+		else
+			button.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+			button.TextColor3 = Color3.fromRGB(200, 200, 200)
+			if indicator then indicator.Visible = false end
+		end
+	end
+	
+	infoLabel.Text = "Selected: Slot " .. slotNumber
+	
+	-- Execute the slot switch
+	local args = {
+		"FruitsHandler",
+		"SwitchSlot",
+		{
+			Slot = slotNumber
+		}
+	}
+	ReplicatedStorage:WaitForChild("Replicator"):InvokeServer(unpack(args))
+end
+
+-- Button clicks
+for i, button in ipairs(slots) do
+	button.MouseButton1Click:Connect(function()
+		switchSlot(i)
+	end)
+	
+	-- Hover effect
+	button.MouseEnter:Connect(function()
+		if i ~= selectedSlot then
+			button.BackgroundColor3 = Color3.fromRGB(70, 70, 90)
+		end
+	end)
+	
+	button.MouseLeave:Connect(function()
+		if i ~= selectedSlot then
+			button.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+		end
+	end)
+end
+
+-- Close button
+closeButton.MouseButton1Click:Connect(function()
+	screenGui:Destroy()
+end)
+
+-- Make draggable
+local dragging = false
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+	local delta = input.Position - dragStart
+	mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+headerFrame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = mainFrame.Position
+		
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+headerFrame.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		update(input)
+	end
+end)
+
+print("Slot Switcher GUI loaded! Default: Slot 1")
